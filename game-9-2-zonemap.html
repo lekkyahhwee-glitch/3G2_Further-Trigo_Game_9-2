@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal Lost 9.2: Search Zone Mapping | Sec 3G2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-deep:#0C2622; --navy-panel:#123B34; --navy-panel-light:#1B5147; --navy-line: rgba(244,247,250,0.09);
+  --orange:#1D9E75; --orange-soft:#5DCAA5; --green:#8FE060; --red:#FF5C5C;
+  --paper:#F4F7FA; --ink-dim:#9FB4CC; --ink-dimmer:#6E88A6;
+  --font-display:'Space Grotesk', sans-serif; --font-body:'Inter', sans-serif; --font-mono:'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box;} html,body{margin:0;padding:0;}
+body{ background:var(--navy-deep); color:var(--paper); font-family:var(--font-body); min-height:100vh; }
+.app{ min-height:100vh; display:flex; flex-direction:column; }
+.topbar{ position:sticky; top:0; z-index:30; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; background:rgba(12,38,34,0.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--navy-line); }
+.brand{ font-family:var(--font-mono); font-size:11.5px; letter-spacing:.08em; color:var(--ink-dimmer); text-transform:uppercase; }
+.topright{ display:flex; align-items:center; gap:14px; }
+.livescore{ font-family:var(--font-mono); font-size:12.5px; background:var(--navy-panel); border:1px solid var(--navy-line); padding:6px 12px; border-radius:20px; }
+.livescore b{ color:var(--green); }
+.stage{ flex:1; display:flex; justify-content:center; padding:40px 20px 70px; position:relative; }
+.screen{ display:none; width:100%; max-width:900px; margin:0 auto; animation:fadein .4s ease; }
+.screen.active{ display:block; }
+@keyframes fadein{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+.eyebrow{ font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.14em; font-size:12px; color:var(--orange-soft); margin-bottom:12px; }
+h1.title{ font-family:var(--font-display); font-weight:700; font-size:clamp(24px,4vw,36px); line-height:1.15; margin:0 0 14px; }
+p.lede{ font-size:15.5px; line-height:1.65; color:var(--ink-dim); max-width:760px; }
+.name-row{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+.name-row input{ flex:1; min-width:200px; background:var(--navy-deep); border:1px solid var(--navy-line); color:var(--paper); font-family:var(--font-body); font-size:15px; padding:12px 14px; border-radius:10px; }
+.name-row input:focus{ outline:none; border-color:var(--orange); }
+.btn{ font-family:var(--font-mono); font-size:13px; text-transform:uppercase; letter-spacing:.05em; background:var(--orange); color:var(--navy-deep); border:none; border-radius:10px; padding:13px 24px; cursor:pointer; font-weight:700; }
+.btn.small{ padding:8px 16px; font-size:11.5px; }
+.btn.ghost{ background:transparent; border:1px solid var(--navy-line); color:var(--ink-dim); }
+.btnrow{ display:flex; gap:12px; margin-top:26px; flex-wrap:wrap; }
+.q-block{ background:var(--navy-panel); border:1px solid var(--navy-line); border-radius:16px; padding:22px 24px; margin-bottom:16px; }
+.q-tag{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-dimmer); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; display:flex; justify-content:space-between; }
+.q-prompt{ font-size:15px; line-height:1.6; margin-bottom:14px; }
+.num-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.num-row input[type=text]{ background:var(--navy-deep); border:1px solid var(--navy-line); color:var(--paper); font-family:var(--font-mono); font-size:15px; padding:10px 12px; border-radius:9px; width:130px; }
+.unit-lbl{ font-family:var(--font-mono); color:var(--ink-dim); font-size:13px; }
+.feedback{ margin-top:10px; font-size:13.5px; font-family:var(--font-mono); display:none; }
+.feedback.show{ display:block; } .feedback.ok{ color:var(--green); } .feedback.bad{ color:var(--red); }
+.hint-btn{ background:none; border:1px dashed var(--ink-dimmer); color:var(--ink-dim); font-family:var(--font-mono); font-size:11.5px; padding:6px 12px; border-radius:8px; cursor:pointer; margin-top:12px; }
+.hint-box{ display:none; margin-top:10px; background:rgba(29,158,117,0.1); border-left:3px solid var(--orange); padding:10px 14px; font-size:13.5px; color:var(--orange-soft); border-radius:0 8px 8px 0; }
+.hint-box.show{ display:block; }
+.sol-box{ display:none; margin-top:14px; background:rgba(143,224,96,0.07); border-left:3px solid var(--green); padding:14px 16px; font-size:13.5px; color:var(--paper); border-radius:0 8px 8px 0; line-height:1.65; }
+.sol-box.show{ display:block; } .sol-box .sol-title{ font-family:var(--font-mono); color:var(--green); font-size:11px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+.sol-box .step{ display:block; margin:3px 0; } .sol-box .step:first-child{ margin-top:0; }
+svg.diagram{ width:100%; max-width:280px; display:block; margin:0 auto; }
+.svg-frame{ display:flex; justify-content:center; margin:14px 0; }
+.q2col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start; }
+@media (max-width:760px){ .q2col{ grid-template-columns:1fr; } }
+.results-wrap{ text-align:center; }
+.idcard{ max-width:420px; margin:26px auto 0; background:linear-gradient(160deg, var(--navy-panel-light), var(--navy-panel)); border:1px solid var(--navy-line); border-radius:20px; padding:26px 26px 20px; text-align:left; }
+.idcard-org{ font-family:var(--font-mono); font-size:10.5px; color:var(--orange-soft); text-transform:uppercase; letter-spacing:.1em; }
+.idcard-name{ font-family:var(--font-display); font-weight:700; font-size:24px; margin:14px 0 2px; }
+.idcard-rank{ font-family:var(--font-mono); font-size:13px; color:var(--green); margin-bottom:16px; }
+.idcard-stat{ background:var(--navy-deep); border:1px solid var(--navy-line); border-radius:10px; padding:10px 12px; margin-bottom:10px; }
+.idcard-stat .lbl{ font-family:var(--font-mono); font-size:9.5px; color:var(--ink-dimmer); text-transform:uppercase; }
+.idcard-stat .v{ font-family:var(--font-mono); font-size:18px; color:var(--paper); margin-top:3px; }
+.starrow{ font-size:18px; letter-spacing:3px; margin-bottom:8px; color:var(--orange-soft); }
+.boat-transition{ position:fixed; bottom:36px; left:-140px; z-index:200; pointer-events:none; animation: boatZoom 1.3s cubic-bezier(.36,.07,.19,.97) forwards; }
+@keyframes boatZoom{ 0%{ left:-140px; opacity:0; } 8%{ opacity:1; } 92%{ opacity:1; } 100%{ left:110%; opacity:0; } }
+.boat-wake{ animation: wakeDash 0.5s linear infinite; } @keyframes wakeDash{ to{ stroke-dashoffset:-20; } }
+.radar-wrap{ position:relative; width:110px; height:110px; margin:0 auto 8px; }
+.radar-ring{ position:absolute; inset:0; border:1.5px solid var(--orange); border-radius:50%; opacity:0; animation: radarPulse 2.4s ease-out infinite; }
+.radar-ring.r2{ animation-delay:0.8s; } .radar-ring.r3{ animation-delay:1.6s; }
+@keyframes radarPulse{ 0%{ transform:scale(0.25); opacity:0.9; } 100%{ transform:scale(1.15); opacity:0; } }
+.radar-dot{ position:absolute; top:50%; left:50%; width:10px; height:10px; margin:-5px; border-radius:50%; background:var(--orange); box-shadow:0 0 12px 2px rgba(29,158,117,0.7); animation: dotBlink 1.6s ease-in-out infinite; }
+@keyframes dotBlink{ 0%,100%{ opacity:1; } 50%{ opacity:0.5; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">Signal Lost 9.2 &middot; Search Zone Mapping</div>
+    <div class="topright"><div class="livescore">Score <b id="liveScore">0</b>/<span id="liveTotal">4</span></div></div>
+  </div>
+  <div class="stage">
+    <section class="screen active" id="screen-intro">
+      <div class="radar-wrap"><div class="radar-ring"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div><div class="radar-dot"></div></div>
+      <div class="eyebrow">Mission Briefing</div>
+      <h1 class="title">Search Zone Mapping</h1>
+      <p class="lede">Command needs the area of each triangular search zone before assigning boats. You have two boundary distances and the angle between them &mdash; Area = ½ ab sin C.</p>
+      <div class="name-row">
+        <input type="text" id="playerName" placeholder="Enter your callsign (your name)" maxlength="24">
+        <input type="text" id="sessionCode" placeholder="Session code (optional)" maxlength="6" style="max-width:180px;">
+      </div>
+      <div class="btnrow"><button class="btn" onclick="startMission()">Start Shift →</button></div>
+    </section>
+
+    <section class="screen" id="screen-s1">
+      <div class="eyebrow">Station &middot; Search Zone Mapping</div>
+      <h1 class="title">Size up the search triangle</h1>
+      <div class="q2col">
+        <div class="q-block">
+          <div class="q-tag"><span>Zone A</span><span>1 pt</span></div>
+          <div class="q-prompt">Two patrol lines run 7 km and 9 km from the command buoy, meeting at 48°. Find the search area.</div>
+          <div class="svg-frame"><svg class="diagram" viewBox="0 0 280 180"><polygon points="140,30 50,150 230,150" fill="none" stroke="#1D9E75" stroke-width="2"/><text x="128" y="52" fill="#9FB4CC" font-size="11" font-family="JetBrains Mono">48°</text><text x="72" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">7 km</text><text x="186" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">9 km</text></svg></div>
+          <div class="num-row"><input type="text" id="num-z1" placeholder="e.g. 12.5"><span class="unit-lbl">km²</span><button class="btn small" onclick="checkNumeric('z1')">Check</button></div>
+          <button class="hint-btn" onclick="toggleHint('z1')">Need a hint?</button>
+          <div class="hint-box" id="hint-z1">Which two lengths meet at the given 48° angle &mdash; and which formula uses two sides and the angle between them?</div>
+          <div class="feedback" id="fb-z1"></div>
+          <div class="sol-box" id="sol-z1"><div class="sol-title">Zone confirmed</div><div class="step">Area = ½ &times; 7 &times; 9 &times; sin48°</div><div class="step">Area = <b>23.4 km²</b> (3 s.f.)</div></div>
+        </div>
+        <div class="q-block">
+          <div class="q-tag"><span>Zone B</span><span>1 pt</span></div>
+          <div class="q-prompt">Boundary lines of 11 km and 13.5 km meet at an obtuse 112°. Find the area.</div>
+          <div class="svg-frame"><svg class="diagram" viewBox="0 0 280 180"><polygon points="140,30 50,150 230,150" fill="none" stroke="#1D9E75" stroke-width="2"/><text x="122" y="52" fill="#9FB4CC" font-size="11" font-family="JetBrains Mono">112°</text><text x="72" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">11 km</text><text x="180" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">13.5 km</text></svg></div>
+          <div class="num-row"><input type="text" id="num-z2" placeholder="e.g. 12.5"><span class="unit-lbl">km²</span><button class="btn small" onclick="checkNumeric('z2')">Check</button></div>
+          <button class="hint-btn" onclick="toggleHint('z2')">Need a hint?</button>
+          <div class="hint-box" id="hint-z2">112° is obtuse &mdash; does that change whether sin112° is positive?</div>
+          <div class="feedback" id="fb-z2"></div>
+          <div class="sol-box" id="sol-z2"><div class="sol-title">Zone confirmed</div><div class="step">Area = ½ &times; 11 &times; 13.5 &times; sin112°</div><div class="step">Area = <b>68.9 km²</b> (3 s.f.)</div></div>
+        </div>
+        <div class="q-block">
+          <div class="q-tag"><span>Zone C</span><span>1 pt</span></div>
+          <div class="q-prompt">A narrow cove: 6.8 km and 5.5 km lines meeting at 39°. Find the area.</div>
+          <div class="svg-frame"><svg class="diagram" viewBox="0 0 280 180"><polygon points="140,30 50,150 230,150" fill="none" stroke="#1D9E75" stroke-width="2"/><text x="128" y="52" fill="#9FB4CC" font-size="11" font-family="JetBrains Mono">39°</text><text x="70" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">6.8 km</text><text x="184" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">5.5 km</text></svg></div>
+          <div class="num-row"><input type="text" id="num-z3" placeholder="e.g. 12.5"><span class="unit-lbl">km²</span><button class="btn small" onclick="checkNumeric('z3')">Check</button></div>
+          <button class="hint-btn" onclick="toggleHint('z3')">Need a hint?</button>
+          <div class="hint-box" id="hint-z3">Same formula as the other zones &mdash; where should your rounding happen, at the very end?</div>
+          <div class="feedback" id="fb-z3"></div>
+          <div class="sol-box" id="sol-z3"><div class="sol-title">Zone confirmed</div><div class="step">Area = ½ &times; 6.8 &times; 5.5 &times; sin39°</div><div class="step">Area = <b>11.8 km²</b> (3 s.f.)</div></div>
+        </div>
+        <div class="q-block">
+          <div class="q-tag"><span>Zone D</span><span>1 pt</span></div>
+          <div class="q-prompt">A wide sweep: 16.2 km and 9 km lines meeting at 146°. Find the area.</div>
+          <div class="svg-frame"><svg class="diagram" viewBox="0 0 280 180"><polygon points="140,30 50,150 230,150" fill="none" stroke="#1D9E75" stroke-width="2"/><text x="122" y="52" fill="#9FB4CC" font-size="11" font-family="JetBrains Mono">146°</text><text x="66" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">16.2 km</text><text x="186" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">9 km</text></svg></div>
+          <div class="num-row"><input type="text" id="num-z4" placeholder="e.g. 12.5"><span class="unit-lbl">km²</span><button class="btn small" onclick="checkNumeric('z4')">Check</button></div>
+          <button class="hint-btn" onclick="toggleHint('z4')">Need a hint?</button>
+          <div class="hint-box" id="hint-z4">146° makes a long, thin zone &mdash; does the area formula still apply the same way?</div>
+          <div class="feedback" id="fb-z4"></div>
+          <div class="sol-box" id="sol-z4"><div class="sol-title">Zone confirmed</div><div class="step">Area = ½ &times; 16.2 &times; 9 &times; sin146°</div><div class="step">Area = <b>40.8 km²</b> (3 s.f.)</div></div>
+        </div>
+      </div>
+      <div class="btnrow"><button class="btn" onclick="showResults()">Submit Report →</button></div>
+    </section>
+
+    <section class="screen" id="screen-results">
+      <div class="results-wrap">
+        <div class="eyebrow" style="justify-content:center; display:flex;">Shift Complete</div>
+        <h1 class="title">Your Rescue Ops ID Card</h1>
+        <div class="idcard">
+          <div class="idcard-org">Coastal Rescue Coordination</div>
+          <div class="idcard-name" id="card-name">Trainee</div>
+          <div class="idcard-rank" id="card-rank">Trainee Spotter</div>
+          <div class="idcard-stat"><div class="lbl">Zone Mapping Score</div><div class="v" id="card-score">0/4</div></div>
+          <div class="starrow" id="card-stars">☆☆☆☆☆</div>
+        </div>
+        <div class="btnrow" style="justify-content:center;"><button class="btn ghost" onclick="location.reload()">Restart</button></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+function playBoatTransition(){
+  const boat = document.createElement('div'); boat.className = 'boat-transition';
+  boat.innerHTML = `<svg width="94" height="48" viewBox="0 0 94 48" fill="none"><path d="M6 34 Q2 40 12 40 L72 40 Q84 40 78 28 L64 18 L18 18 Z" fill="#1D9E75"/><rect x="36" y="4" width="5" height="16" fill="#F4F7FA"/><path d="M41 6 L60 18 L41 18 Z" fill="#8FE060"/><path class="boat-wake" d="M6 41 Q -8 44 -22 41 M2 45 Q -10 48 -20 45" stroke="#9FB4CC" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 5" fill="none"/></svg>`;
+  document.body.appendChild(boat); setTimeout(()=>boat.remove(), 1400);
+}
+function goToScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(id !== 'screen-intro') playBoatTransition();
+}
+function startMission(){
+  const name = document.getElementById('playerName').value.trim();
+  window.playerName = name || 'Trainee';
+  goToScreen('screen-s1');
+}
+const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxWpIFgx_roKAjfRrMFN1evKuRmrPQBpy_1IxnTQR642aImw4hwO2wVs1K_cEJnV_ud/exec';
+const QUESTION_SKILL = { z1:'9.2 Area of Triangle', z2:'9.2 Area of Triangle', z3:'9.2 Area of Triangle', z4:'9.2 Area of Triangle' };
+function logAttempt(qid, correctFlag, attemptsUsed){
+  const skill = QUESTION_SKILL[qid] || 'General';
+  const payload = { sessionCode: (document.getElementById('sessionCode').value||'').trim(), studentName: window.playerName || 'Trainee', round: 'Game 9.2', skill: skill, attempts: attemptsUsed, correct: correctFlag ? 'correct' : 'wrong', timestamp: new Date().toISOString() };
+  try{ fetch(BACKEND_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) }).catch(()=>{}); } catch(e){}
+}
+const TOTAL = 4;
+let score = 0;
+const attempts = {};
+function updateScore(){ document.getElementById('liveScore').textContent = score; }
+document.getElementById('liveTotal').textContent = TOTAL;
+function toggleHint(id){ document.getElementById('hint-'+id).classList.toggle('show'); }
+function markResult(qid, isCorrect){
+  const fb = document.getElementById('fb-'+qid);
+  attempts[qid] = (attempts[qid]||0) + 1;
+  if(isCorrect){
+    fb.textContent = 'Confirmed correct.'; fb.className='feedback show ok';
+    if(!attempts['scored-'+qid]){ score++; attempts['scored-'+qid]=true; updateScore(); }
+    document.getElementById('sol-'+qid).classList.add('show');
+    if(!attempts['logged-'+qid]){ logAttempt(qid, true, attempts[qid]); attempts['logged-'+qid]=true; }
+  } else {
+    if(attempts[qid] >= 2){
+      fb.textContent = "Here's the correct call:"; fb.className='feedback show bad';
+      document.getElementById('sol-'+qid).classList.add('show');
+      if(!attempts['logged-'+qid]){ logAttempt(qid, false, 2); attempts['logged-'+qid]=true; }
+    } else { fb.textContent = 'Not quite — try again, or tap the hint.'; fb.className='feedback show bad'; }
+  }
+}
+function checkNumeric(qid){
+  const raw = document.getElementById('num-'+qid).value.trim();
+  const cfg = NUM_ANSWERS[qid];
+  const val = parseFloat(raw.replace(/[^0-9.\-]/g,''));
+  const isCorrect = !isNaN(val) && Math.abs(val - cfg.answer) <= cfg.tol;
+  markResult(qid, isCorrect);
+}
+const NUM_ANSWERS = { z1:{answer:23.4,tol:0.2}, z2:{answer:68.9,tol:0.3}, z3:{answer:11.8,tol:0.2}, z4:{answer:40.8,tol:0.3} };
+function showResults(){
+  goToScreen('screen-results');
+  document.getElementById('card-name').textContent = window.playerName || 'Trainee';
+  document.getElementById('card-score').textContent = score + '/' + TOTAL;
+  let rank = 'Trainee Spotter';
+  if(score >= 4) rank = 'Chief Rescue Coordinator'; else if(score >= 3) rank = 'Lead Triangulator'; else if(score >= 2) rank = 'Field Analyst';
+  document.getElementById('card-rank').textContent = rank;
+  const starsFull = Math.round((score/TOTAL)*5);
+  document.getElementById('card-stars').textContent = '★'.repeat(starsFull) + '☆'.repeat(5-starsFull);
+}
+</script>
+</body>
+</html>
