@@ -3,224 +3,1046 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Signal Lost 9.2: Search Zone Mapping | Sec 3G2</title>
+<title>Castle Builder — 9.2 Area of a Triangle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --navy-deep:#0C2622; --navy-panel:#123B34; --navy-panel-light:#1B5147; --navy-line: rgba(244,247,250,0.09);
-  --orange:#1D9E75; --orange-soft:#5DCAA5; --green:#8FE060; --red:#FF5C5C;
-  --paper:#F4F7FA; --ink-dim:#9FB4CC; --ink-dimmer:#6E88A6;
-  --font-display:'Space Grotesk', sans-serif; --font-body:'Inter', sans-serif; --font-mono:'JetBrains Mono', monospace;
-}
-*{box-sizing:border-box;} html,body{margin:0;padding:0;}
-body{ background:var(--navy-deep); color:var(--paper); font-family:var(--font-body); min-height:100vh; }
-.app{ min-height:100vh; display:flex; flex-direction:column; }
-.topbar{ position:sticky; top:0; z-index:30; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; background:rgba(12,38,34,0.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--navy-line); }
-.brand{ font-family:var(--font-mono); font-size:11.5px; letter-spacing:.08em; color:var(--ink-dimmer); text-transform:uppercase; }
-.topright{ display:flex; align-items:center; gap:14px; }
-.livescore{ font-family:var(--font-mono); font-size:12.5px; background:var(--navy-panel); border:1px solid var(--navy-line); padding:6px 12px; border-radius:20px; }
-.livescore b{ color:var(--green); }
-.stage{ flex:1; display:flex; justify-content:center; padding:40px 20px 70px; position:relative; }
-.screen{ display:none; width:100%; max-width:900px; margin:0 auto; animation:fadein .4s ease; }
-.screen.active{ display:block; }
-@keyframes fadein{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
-.eyebrow{ font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.14em; font-size:12px; color:var(--orange-soft); margin-bottom:12px; }
-h1.title{ font-family:var(--font-display); font-weight:700; font-size:clamp(24px,4vw,36px); line-height:1.15; margin:0 0 14px; }
-p.lede{ font-size:15.5px; line-height:1.65; color:var(--ink-dim); max-width:760px; }
-.name-row{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
-.name-row input{ flex:1; min-width:200px; background:var(--navy-deep); border:1px solid var(--navy-line); color:var(--paper); font-family:var(--font-body); font-size:15px; padding:12px 14px; border-radius:10px; }
-.name-row input:focus{ outline:none; border-color:var(--orange); }
-.btn{ font-family:var(--font-mono); font-size:13px; text-transform:uppercase; letter-spacing:.05em; background:var(--orange); color:var(--navy-deep); border:none; border-radius:10px; padding:13px 24px; cursor:pointer; font-weight:700; }
-.btn.small{ padding:8px 16px; font-size:11.5px; }
-.btn.ghost{ background:transparent; border:1px solid var(--navy-line); color:var(--ink-dim); }
-.btnrow{ display:flex; gap:12px; margin-top:26px; flex-wrap:wrap; }
-.q-block{ background:var(--navy-panel); border:1px solid var(--navy-line); border-radius:16px; padding:22px 24px; margin-bottom:16px; }
-.q-tag{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-dimmer); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; display:flex; justify-content:space-between; }
-.q-prompt{ font-size:15px; line-height:1.6; margin-bottom:14px; }
-.num-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-.num-row input[type=text]{ background:var(--navy-deep); border:1px solid var(--navy-line); color:var(--paper); font-family:var(--font-mono); font-size:15px; padding:10px 12px; border-radius:9px; width:130px; }
-.unit-lbl{ font-family:var(--font-mono); color:var(--ink-dim); font-size:13px; }
-.feedback{ margin-top:10px; font-size:13.5px; font-family:var(--font-mono); display:none; }
-.feedback.show{ display:block; } .feedback.ok{ color:var(--green); } .feedback.bad{ color:var(--red); }
-.hint-btn{ background:none; border:1px dashed var(--ink-dimmer); color:var(--ink-dim); font-family:var(--font-mono); font-size:11.5px; padding:6px 12px; border-radius:8px; cursor:pointer; margin-top:12px; }
-.hint-box{ display:none; margin-top:10px; background:rgba(29,158,117,0.1); border-left:3px solid var(--orange); padding:10px 14px; font-size:13.5px; color:var(--orange-soft); border-radius:0 8px 8px 0; }
-.hint-box.show{ display:block; }
-.sol-box{ display:none; margin-top:14px; background:rgba(143,224,96,0.07); border-left:3px solid var(--green); padding:14px 16px; font-size:13.5px; color:var(--paper); border-radius:0 8px 8px 0; line-height:1.65; }
-.sol-box.show{ display:block; } .sol-box .sol-title{ font-family:var(--font-mono); color:var(--green); font-size:11px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
-.sol-box .step{ display:block; margin:3px 0; } .sol-box .step:first-child{ margin-top:0; }
-svg.diagram{ width:100%; max-width:280px; display:block; margin:0 auto; }
-.svg-frame{ display:flex; justify-content:center; margin:14px 0; }
-.q2col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start; }
-@media (max-width:760px){ .q2col{ grid-template-columns:1fr; } }
-.results-wrap{ text-align:center; }
-.idcard{ max-width:420px; margin:26px auto 0; background:linear-gradient(160deg, var(--navy-panel-light), var(--navy-panel)); border:1px solid var(--navy-line); border-radius:20px; padding:26px 26px 20px; text-align:left; }
-.idcard-org{ font-family:var(--font-mono); font-size:10.5px; color:var(--orange-soft); text-transform:uppercase; letter-spacing:.1em; }
-.idcard-name{ font-family:var(--font-display); font-weight:700; font-size:24px; margin:14px 0 2px; }
-.idcard-rank{ font-family:var(--font-mono); font-size:13px; color:var(--green); margin-bottom:16px; }
-.idcard-stat{ background:var(--navy-deep); border:1px solid var(--navy-line); border-radius:10px; padding:10px 12px; margin-bottom:10px; }
-.idcard-stat .lbl{ font-family:var(--font-mono); font-size:9.5px; color:var(--ink-dimmer); text-transform:uppercase; }
-.idcard-stat .v{ font-family:var(--font-mono); font-size:18px; color:var(--paper); margin-top:3px; }
-.starrow{ font-size:18px; letter-spacing:3px; margin-bottom:8px; color:var(--orange-soft); }
-.boat-transition{ position:fixed; bottom:36px; left:-140px; z-index:200; pointer-events:none; animation: boatZoom 1.3s cubic-bezier(.36,.07,.19,.97) forwards; }
-@keyframes boatZoom{ 0%{ left:-140px; opacity:0; } 8%{ opacity:1; } 92%{ opacity:1; } 100%{ left:110%; opacity:0; } }
-.boat-wake{ animation: wakeDash 0.5s linear infinite; } @keyframes wakeDash{ to{ stroke-dashoffset:-20; } }
-.radar-wrap{ position:relative; width:110px; height:110px; margin:0 auto 8px; }
-.radar-ring{ position:absolute; inset:0; border:1.5px solid var(--orange); border-radius:50%; opacity:0; animation: radarPulse 2.4s ease-out infinite; }
-.radar-ring.r2{ animation-delay:0.8s; } .radar-ring.r3{ animation-delay:1.6s; }
-@keyframes radarPulse{ 0%{ transform:scale(0.25); opacity:0.9; } 100%{ transform:scale(1.15); opacity:0; } }
-.radar-dot{ position:absolute; top:50%; left:50%; width:10px; height:10px; margin:-5px; border-radius:50%; background:var(--orange); box-shadow:0 0 12px 2px rgba(29,158,117,0.7); animation: dotBlink 1.6s ease-in-out infinite; }
-@keyframes dotBlink{ 0%,100%{ opacity:1; } 50%{ opacity:0.5; } }
+  :root{
+    --ink:#1B3A6B; --paper:#F1F7F5; --panel:#15294D;
+    --wood:#A9662E; --wood-dark:#7A4A20;
+    --stone:#9AA0A8; --stone-dark:#6E747C;
+    --gold:#FFC93C; --gold-dark:#C7860A; --gold-shine:#FFF6C9;
+    --coral:#FF5A45;
+    --line:rgba(241,247,245,0.14);
+    --toolbar-h:56px;
+    --font-display:'Space Grotesk', sans-serif; --font-body:'Inter', sans-serif; --font-mono:'JetBrains Mono', monospace;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:var(--font-body); color:#fff; background:var(--ink); min-height:100vh; padding-bottom:calc(var(--toolbar-h) + 1rem); }
+  h1,h2,h3{ font-family:var(--font-display); font-weight:800; letter-spacing:-0.01em; }
+  .wrap{ max-width:940px; margin:0 auto; padding:2rem 5vw 1rem; }
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+
+  /* ---------- Intro ---------- */
+  .intro-card{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:2rem 1.6rem; text-align:center; }
+  .intro-card h1{ font-size:1.7rem; margin-bottom:0.6rem; }
+  .intro-card p{ font-family:var(--font-mono); font-size:0.82rem; opacity:0.75; line-height:1.7; margin-bottom:1.4rem; }
+  .intro-card p strong{ color:var(--gold); }
+  .intro-field{ margin-bottom:0.9rem; text-align:left; max-width:340px; margin-left:auto; margin-right:auto; }
+  .intro-field label{ font-family:var(--font-mono); font-size:0.72rem; opacity:0.7; display:block; margin-bottom:0.3rem; }
+  .intro-field input{ width:100%; background:rgba(255,255,255,0.08); border:1.5px solid var(--line); border-radius:8px; padding:0.7rem 0.9rem; color:#fff; font-family:var(--font-body); font-size:0.95rem; }
+  .start-btn{ font-family:var(--font-display); font-weight:800; font-size:1rem; background:var(--gold); color:#1B0F00; border:none; border-radius:12px; padding:0.85rem 2.2rem; cursor:pointer; margin-top:0.6rem; }
+
+  /* ---------- Game screen ---------- */
+  .top-bar{ display:flex; justify-content:space-between; align-items:center; font-family:var(--font-mono); font-size:0.76rem; opacity:0.75; margin-bottom:0.8rem; flex-wrap:wrap; gap:0.5rem; }
+  .stage{
+    background:linear-gradient(180deg, #FDE9C8 0%, #F7C68B 35%, #E8965F 60%, #C97350 100%);
+    border-radius:20px; border:1px solid var(--line);
+    padding:2.2rem 1.4rem 1.2rem; display:flex; flex-direction:column; align-items:center;
+    position:relative; overflow:hidden; min-height:280px;
+  }
+  .sun{ position:absolute; top:20px; right:40px; width:56px; height:56px; border-radius:50%;
+    background:radial-gradient(circle, #FFF6C9 0%, #FFD867 60%, rgba(255,216,103,0) 75%); }
+  .cloud1{ position:absolute; top:36px; left:30px; width:50px; height:18px; background:#fff; border-radius:20px; opacity:0.85; }
+  .cloud1::before{ content:''; position:absolute; width:24px; height:24px; top:-11px; left:6px; background:#fff; border-radius:50%; }
+  .cloud1::after{ content:''; position:absolute; width:20px; height:20px; top:-8px; left:26px; background:#fff; border-radius:50%; }
+  .ground{ position:absolute; bottom:0; left:0; right:0; height:22px; background:linear-gradient(180deg, #3F8F3F, #2C6B2C); border-top:3px solid #4FA84F; }
+
+  .castle-grid{ display:grid; grid-template-columns:repeat(7, 40px); grid-auto-rows:40px; gap:2px; position:relative; z-index:2; margin-top:auto; }
+  .cell{ border-radius:4px; position:relative; }
+  .cell.empty{ border:1.5px dashed rgba(255,255,255,0.35); background:rgba(255,255,255,0.08); }
+  .cell.filled{ animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1); box-shadow: inset 0 3px 0 rgba(255,255,255,0.4), inset 0 -5px 0 rgba(0,0,0,0.3); }
+  .cell.wood{ background-color:var(--wood); background-image:repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 3px, transparent 3px 10px); }
+  .cell.stone{ background-color:var(--stone); }
+  .cell.gold{ background-color:var(--gold); position:relative; overflow:hidden; }
+  .cell.gold::after{ content:''; position:absolute; top:0; left:-60%; width:40%; height:100%; background:linear-gradient(120deg, transparent, rgba(255,255,255,0.75), transparent); animation: shine 2.4s ease-in-out infinite; }
+  @keyframes shine{ 0%{ left:-60%; } 50%{ left:120%; } 100%{ left:120%; } }
+  .cell .door{ position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:16px; height:24px; background:#3A2311; border-radius:6px 6px 0 0; }
+  @keyframes popIn{ 0%{ transform:scale(0); opacity:0; } 60%{ transform:scale(1.15); opacity:1; } 100%{ transform:scale(1); } }
+
+  .flag-pole{ position:absolute; width:3px; background:#4A3018; z-index:5; }
+  .flag{ position:absolute; opacity:0; transform-origin:left center; z-index:5; }
+  .flag.show{ animation: flagIn 0.5s ease forwards; }
+  @keyframes flagIn{ from{ opacity:0; transform:scale(0.3); } to{ opacity:1; transform:scale(1); } }
+  .flag-wood{ width:22px; height:14px; background:#C97A3E; clip-path:polygon(0 0,100% 20%,0 40%); }
+  .flag-wood.show{ animation: flagIn 0.5s ease forwards, waveSmall 2s ease-in-out 0.5s infinite; }
+  .flag-stone{ width:32px; height:20px; background:linear-gradient(135deg,#C9CFD6,#9AA0A8); clip-path:polygon(0 0,100% 15%,88% 50%,100% 85%,0 100%); }
+  .flag-stone.show{ animation: flagIn 0.5s ease forwards, waveMed 1.8s ease-in-out 0.5s infinite; }
+  .flag-gold{ width:46px; height:30px; background:linear-gradient(135deg,#FFF6C9,#FFC93C 40%,#C7860A); clip-path:polygon(0 0,100% 12%,85% 50%,100% 88%,0 100%); box-shadow:0 0 18px rgba(255,201,60,0.9); }
+  .flag-gold.show{ animation: flagIn 0.6s ease forwards, waveBig 1.5s ease-in-out 0.6s infinite; }
+  .flag-gold-crest{ position:absolute; left:6px; top:6px; font-size:12px; opacity:0; }
+  .flag-gold-crest.show{ animation: flagIn 0.6s ease 0.3s forwards; }
+  @keyframes waveSmall{ 0%,100%{ clip-path:polygon(0 0,100% 20%,0 40%); } 50%{ clip-path:polygon(0 0,96% 26%,0 40%); } }
+  @keyframes waveMed{ 0%,100%{ clip-path:polygon(0 0,100% 15%,88% 50%,100% 85%,0 100%); } 50%{ clip-path:polygon(0 0,94% 20%,84% 50%,94% 80%,0 100%); } }
+  @keyframes waveBig{ 0%,100%{ clip-path:polygon(0 0,100% 12%,85% 50%,100% 88%,0 100%); } 50%{ clip-path:polygon(0 0,92% 18%,80% 50%,92% 82%,0 100%); } }
+  .sparkle{ position:absolute; font-size:14px; opacity:0; pointer-events:none; z-index:6; }
+  .sparkle.play{ animation: sparklePop 1.4s ease-out forwards; }
+  @keyframes sparklePop{ 0%{ opacity:0; transform:translateY(0) scale(0.5); } 30%{ opacity:1; } 100%{ opacity:0; transform:translateY(-40px) scale(1.2); } }
+  .rank-banner{ position:absolute; top:10px; left:50%; transform:translateX(-50%) scale(0.7); z-index:6; font-family:var(--font-display); font-weight:800; font-size:1rem; text-align:center; opacity:0; transition:opacity 0.4s, transform 0.4s; padding:0.5rem 1.1rem; border-radius:10px; }
+  .rank-banner.show{ opacity:1; transform:translateX(-50%) scale(1); }
+  .rank-banner.gold{ background:rgba(199,134,10,0.35); color:#FFF6C9; text-shadow:0 0 14px rgba(255,201,60,0.9); border:1px solid rgba(255,201,60,0.6); }
+  .rank-banner.stone{ background:rgba(90,96,104,0.4); color:#F1F7F5; border:1px solid rgba(200,206,214,0.5); }
+  .rank-banner.wood{ background:rgba(90,58,20,0.4); color:#FDE9C8; border:1px solid rgba(201,122,62,0.5); }
+
+  .overall-bar-wrap{ width:100%; max-width:480px; margin:1rem auto 0; }
+  .overall-label{ font-family:var(--font-mono); font-size:0.74rem; opacity:0.7; margin-bottom:0.4rem; display:flex; justify-content:space-between; }
+  .overall-track{ height:12px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; }
+  .overall-fill{ height:100%; background:linear-gradient(90deg, var(--wood), var(--stone), var(--gold)); border-radius:10px; transition:width 0.4s ease; width:0%; }
+
+  /* ---------- Question card ---------- */
+  .question-card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:1.4rem 1.3rem; margin-top:1.2rem; }
+  .q-skill-tag{ font-family:var(--font-mono); font-size:0.68rem; opacity:0.6; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.04em; }
+  .q-think-badge{ display:inline-block; background:rgba(255,201,60,0.2); color:var(--gold); border:1px solid var(--gold); border-radius:6px; padding:0.1rem 0.5rem; font-size:0.7rem; font-family:var(--font-mono); margin-left:0.5rem; }
+  .q-prompt{ font-family:var(--font-display); font-weight:700; font-size:1.12rem; margin-bottom:1rem; line-height:1.55; }
+  .q-diagram{ display:flex; justify-content:center; margin-bottom:1.1rem; background:rgba(255,255,255,0.05); border-radius:12px; padding:0.8rem; }
+  .q-options{ display:flex; flex-direction:column; gap:0.6rem; }
+  .q-option{ background:rgba(255,255,255,0.06); border:1.5px solid var(--line); border-radius:10px; padding:0.75rem 0.95rem; cursor:pointer; font-family:var(--font-body); font-size:0.95rem; text-align:left; color:#fff; }
+  .q-option:hover{ background:rgba(255,255,255,0.13); }
+  .q-option.correct{ border-color:#39FF88; background:rgba(57,255,136,0.18); }
+  .q-option.wrong{ border-color:var(--coral); background:rgba(255,90,69,0.18); }
+  .q-option:disabled, .q-option.locked{ cursor:default; }
+  .q-input-row{ display:flex; gap:0.7rem; flex-wrap:wrap; align-items:center; }
+  .q-input-field{ display:flex; flex-direction:column; gap:0.3rem; }
+  .q-input-field label{ font-family:var(--font-mono); font-size:0.72rem; opacity:0.7; }
+  .q-input{ background:rgba(255,255,255,0.08); border:1.5px solid var(--line); border-radius:8px; padding:0.65rem 0.85rem; color:#fff; font-family:var(--font-mono); font-size:0.95rem; width:190px; }
+  .q-submit-btn{ background:var(--gold); color:#1B0F00; font-family:var(--font-display); font-weight:800; border:none; border-radius:10px; padding:0.7rem 1.4rem; cursor:pointer; margin-top:1.1rem; }
+  .q-submit-btn:disabled{ opacity:0.4; cursor:default; }
+  .hint-box{ background:rgba(255,201,60,0.12); border:1.5px solid var(--gold); border-radius:10px; padding:0.85rem 1rem; margin-top:1rem; font-size:0.86rem; line-height:1.55; display:none; }
+  .hint-box.show{ display:block; }
+  .help-msg{ background:rgba(255,90,69,0.14); border:1.5px solid var(--coral); border-radius:10px; padding:0.85rem 1rem; margin-top:1rem; font-size:0.86rem; line-height:1.55; display:none; }
+  .help-msg.show{ display:block; }
+  .solution-box{ background:rgba(255,255,255,0.06); border:1.5px solid var(--line); border-radius:10px; padding:0.95rem 1.05rem; margin-top:0.9rem; display:none; }
+  .solution-box.show{ display:block; }
+  .solution-box .sol-title{ font-family:var(--font-mono); font-size:0.72rem; opacity:0.7; margin-bottom:0.5rem; text-transform:uppercase; }
+  .solution-box .step{ font-family:var(--font-mono); font-size:0.88rem; padding:0.22rem 0; }
+  .feedback-line{ font-family:var(--font-mono); font-size:0.84rem; margin-top:0.8rem; display:none; }
+  .feedback-line.show{ display:block; }
+  .feedback-line.good{ color:#39FF88; }
+  .feedback-line.bad{ color:var(--coral); }
+  .continue-btn{ background:rgba(255,255,255,0.1); border:1.5px solid var(--line); color:#fff; font-family:var(--font-display); font-weight:700; border-radius:10px; padding:0.7rem 1.4rem; cursor:pointer; margin-top:1.1rem; display:none; }
+  .continue-btn.show{ display:inline-block; }
+
+  /* ---------- Math toolbar ---------- */
+  .math-toolbar{ position:fixed; left:0; right:0; bottom:0; height:var(--toolbar-h); display:flex; flex-wrap:wrap; gap:0.35rem; align-items:center; overflow-x:auto; background:#0F1D38; border-top:1px solid var(--line); padding:0.5rem 0.7rem; z-index:30; }
+  .math-toolbar button{ background:rgba(255,255,255,0.08); border:1px solid var(--line); color:#fff; border-radius:6px; padding:0.32rem 0.55rem; font-family:var(--font-mono); font-size:0.8rem; cursor:pointer; flex:0 0 auto; }
+  .math-toolbar button:hover{ background:rgba(255,255,255,0.18); }
+
+  /* ---------- Laser ---------- */
+  .laser-toggle{ position:fixed; bottom:calc(var(--toolbar-h) + 12px); right:14px; z-index:40; background:var(--panel); border:1.5px solid var(--line); color:#fff; font-family:var(--font-mono); font-size:0.74rem; border-radius:20px; padding:0.5rem 0.9rem; cursor:pointer; }
+  .laser-toggle.active{ border-color:var(--gold); color:var(--gold); }
+  .laser-dot{ position:fixed; width:18px; height:18px; border-radius:50%; background:radial-gradient(circle, #FFF6C9 0%, #FFD867 55%, rgba(255,216,103,0) 75%); pointer-events:none; z-index:999; display:none; transform:translate(-50%,-50%); }
+  @media print{ .laser-toggle, .laser-dot{ display:none !important; } }
+
+  /* ---------- Modals (glitch / confirm) ---------- */
+  .modal-overlay{ position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; background:rgba(5,5,10,0.85); }
+  .modal-overlay.show{ display:flex; }
+  .modal-card{ background:#0A0A12; border:2px solid #39FF88; border-radius:12px; padding:1.6rem 1.5rem; max-width:380px; width:88%; font-family:var(--font-mono); color:#39FF88; text-align:center; box-shadow:0 0 30px rgba(57,255,136,0.4); }
+  .modal-card.plain{ border-color:var(--gold); color:#fff; }
+  .glitch-card{ animation: glitchShake 0.15s linear infinite; }
+  @keyframes glitchShake{ 0%{transform:translate(0,0);} 20%{transform:translate(-1px,1px);} 40%{transform:translate(1px,-1px);} 60%{transform:translate(-1px,-1px);} 80%{transform:translate(1px,1px);} 100%{transform:translate(0,0);} }
+  .modal-title{ font-size:1rem; font-weight:700; margin-bottom:0.8rem; letter-spacing:0.05em; }
+  .modal-body{ font-size:0.8rem; line-height:1.6; margin-bottom:1.2rem; }
+  .modal-actions{ display:flex; flex-direction:column; gap:0.6rem; }
+  .modal-btn{ font-family:var(--font-mono); font-size:0.82rem; padding:0.6rem 0.9rem; border-radius:8px; cursor:pointer; font-weight:700; border:1px solid; background:transparent; }
+  .modal-btn.primary{ background:#39FF88; color:#0A0A12; border-color:#39FF88; }
+  .modal-btn.ghost{ color:#8FA0A8; border-color:#3A4048; }
+  .reset-flash{ position:fixed; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:11; }
+  .reset-flash.play{ animation: flashOut 0.6s ease-out forwards; }
+  @keyframes flashOut{ 0%{opacity:0.95;} 100%{opacity:0;} }
+  .toast{ position:fixed; bottom:calc(var(--toolbar-h) + 12px); left:50%; transform:translateX(-50%) translateY(20px); z-index:41; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:0.7rem 1.1rem; font-family:var(--font-mono); font-size:0.76rem; opacity:0; transition:opacity 0.3s, transform 0.3s; text-align:center; max-width:85%; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .footer-row{ display:flex; justify-content:center; margin-top:1.4rem; }
+  .reset-link{ font-family:var(--font-mono); font-size:0.72rem; opacity:0.55; background:none; border:none; color:#fff; text-decoration:underline; cursor:pointer; }
+
+  /* ---------- Gaps report ---------- */
+  .gaps-header{ text-align:center; margin-bottom:1.2rem; }
+  .gaps-header h2{ font-size:1.4rem; }
+  .gap-card{ background:var(--panel); border:1.5px solid var(--coral); border-radius:14px; padding:1.2rem 1.3rem; margin-bottom:1.1rem; }
+  .gap-card.solid{ border-color:#39FF88; }
+  .gap-skill{ font-family:var(--font-display); font-weight:800; font-size:1.02rem; margin-bottom:0.5rem; }
+  .gap-def{ font-size:0.9rem; line-height:1.6; margin-bottom:0.8rem; opacity:0.9; }
+  .gap-example .sol-title{ font-family:var(--font-mono); font-size:0.7rem; opacity:0.65; text-transform:uppercase; margin-bottom:0.4rem; }
+  .gap-example .step{ font-family:var(--font-mono); font-size:0.86rem; padding:0.18rem 0; }
+  .gap-pointer{ font-family:var(--font-mono); font-size:0.76rem; opacity:0.65; margin-top:0.8rem; }
+  .gap-practice{ margin-top:0.9rem; padding-top:0.9rem; border-top:1px dashed var(--line); }
+  .solid-chip{ display:inline-block; background:rgba(57,255,136,0.15); color:#39FF88; border:1px solid #39FF88; border-radius:8px; padding:0.3rem 0.7rem; font-family:var(--font-mono); font-size:0.76rem; }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="topbar">
-    <div class="brand">Signal Lost 9.2 &middot; Search Zone Mapping</div>
-    <div class="topright"><div class="livescore">Score <b id="liveScore">0</b>/<span id="liveTotal">4</span></div></div>
+
+<div class="wrap">
+
+  <!-- ================= INTRO SCREEN ================= -->
+  <div class="screen active" id="screenIntro">
+    <div class="intro-card">
+      <h1>🏰 Castle Builder</h1>
+      <p>Chapter 9.2 — Area of a Triangle<br>Every question adds ONE block to your castle. Get it right first try → <strong>Gold</strong>. Right on 2nd try → <strong>Stone</strong>. Miss it twice → <strong>Wood</strong>.<br>19 questions on Area = ½ab sinC, and working backwards from area to angle.</p>
+      <div class="intro-field">
+        <label>Your name</label>
+        <input type="text" id="studentNameInput" placeholder="e.g. Aisyah">
+      </div>
+      <div class="intro-field">
+        <label>Session code (optional — ask your teacher)</label>
+        <input type="text" id="sessionCodeInput" placeholder="e.g. 483920" inputmode="numeric">
+      </div>
+      <button class="start-btn" id="startBtn">Start Building 🧱</button>
+    </div>
   </div>
-  <div class="stage">
-    <section class="screen active" id="screen-intro">
-      <div class="radar-wrap"><div class="radar-ring"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div><div class="radar-dot"></div></div>
-      <div class="eyebrow">Mission Briefing</div>
-      <h1 class="title">Search Zone Mapping</h1>
-      <p class="lede">Command needs the area of each triangular search zone before assigning boats. You have two boundary distances and the angle between them &mdash; Area = ½ ab sin C.</p>
-      <div class="name-row">
-        <input type="text" id="playerName" placeholder="Enter your callsign (your name)" maxlength="24">
-        <input type="text" id="sessionCode" placeholder="Session code (optional)" maxlength="6" style="max-width:180px;">
-      </div>
-      <div class="btnrow"><button class="btn" onclick="startMission()">Start Shift →</button></div>
-    </section>
 
-    <section class="screen" id="screen-s1">
-      <div class="eyebrow">Station &middot; Search Zone Mapping</div>
-      <h1 class="title">Size up the search triangle</h1>
-      <div class="q2col">
-        <div class="q-block">
-          <div class="q-tag"><span>Zone A</span><span>1 pt</span></div>
-          <div class="q-prompt">Two patrol lines run 7 km and 9 km from the command buoy, meeting at 48°. Find the search area.</div>
-          <div class="svg-frame"><svg class="diagram" viewBox="0 0 280 180"><polygon points="140,30 50,150 230,150" fill="none" stroke="#1D9E75" stroke-width="2"/><text x="128" y="52" fill="#9FB4CC" font-size="11" font-family="JetBrains Mono">48°</text><text x="72" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">7 km</text><text x="186" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">9 km</text></svg></div>
-          <div class="num-row"><input type="text" id="num-z1" placeholder="e.g. 12.5"><span class="unit-lbl">km²</span><button class="btn small" onclick="checkNumeric('z1')">Check</button></div>
-          <button class="hint-btn" onclick="toggleHint('z1')">Need a hint?</button>
-          <div class="hint-box" id="hint-z1">Which two lengths meet at the given 48° angle &mdash; and which formula uses two sides and the angle between them?</div>
-          <div class="feedback" id="fb-z1"></div>
-          <div class="sol-box" id="sol-z1"><div class="sol-title">Zone confirmed</div><div class="step">Area = ½ &times; 7 &times; 9 &times; sin48°</div><div class="step">Area = <b>23.4 km²</b> (3 s.f.)</div></div>
-        </div>
-        <div class="q-block">
-          <div class="q-tag"><span>Zone B</span><span>1 pt</span></div>
-          <div class="q-prompt">Boundary lines of 11 km and 13.5 km meet at an obtuse 112°. Find the area.</div>
-          <div class="svg-frame"><svg class="diagram" viewBox="0 0 280 180"><polygon points="140,30 50,150 230,150" fill="none" stroke="#1D9E75" stroke-width="2"/><text x="122" y="52" fill="#9FB4CC" font-size="11" font-family="JetBrains Mono">112°</text><text x="72" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">11 km</text><text x="180" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">13.5 km</text></svg></div>
-          <div class="num-row"><input type="text" id="num-z2" placeholder="e.g. 12.5"><span class="unit-lbl">km²</span><button class="btn small" onclick="checkNumeric('z2')">Check</button></div>
-          <button class="hint-btn" onclick="toggleHint('z2')">Need a hint?</button>
-          <div class="hint-box" id="hint-z2">112° is obtuse &mdash; does that change whether sin112° is positive?</div>
-          <div class="feedback" id="fb-z2"></div>
-          <div class="sol-box" id="sol-z2"><div class="sol-title">Zone confirmed</div><div class="step">Area = ½ &times; 11 &times; 13.5 &times; sin112°</div><div class="step">Area = <b>68.9 km²</b> (3 s.f.)</div></div>
-        </div>
-        <div class="q-block">
-          <div class="q-tag"><span>Zone C</span><span>1 pt</span></div>
-          <div class="q-prompt">A narrow cove: 6.8 km and 5.5 km lines meeting at 39°. Find the area.</div>
-          <div class="svg-frame"><svg class="diagram" viewBox="0 0 280 180"><polygon points="140,30 50,150 230,150" fill="none" stroke="#1D9E75" stroke-width="2"/><text x="128" y="52" fill="#9FB4CC" font-size="11" font-family="JetBrains Mono">39°</text><text x="70" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">6.8 km</text><text x="184" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">5.5 km</text></svg></div>
-          <div class="num-row"><input type="text" id="num-z3" placeholder="e.g. 12.5"><span class="unit-lbl">km²</span><button class="btn small" onclick="checkNumeric('z3')">Check</button></div>
-          <button class="hint-btn" onclick="toggleHint('z3')">Need a hint?</button>
-          <div class="hint-box" id="hint-z3">Same formula as the other zones &mdash; where should your rounding happen, at the very end?</div>
-          <div class="feedback" id="fb-z3"></div>
-          <div class="sol-box" id="sol-z3"><div class="sol-title">Zone confirmed</div><div class="step">Area = ½ &times; 6.8 &times; 5.5 &times; sin39°</div><div class="step">Area = <b>11.8 km²</b> (3 s.f.)</div></div>
-        </div>
-        <div class="q-block">
-          <div class="q-tag"><span>Zone D</span><span>1 pt</span></div>
-          <div class="q-prompt">A wide sweep: 16.2 km and 9 km lines meeting at 146°. Find the area.</div>
-          <div class="svg-frame"><svg class="diagram" viewBox="0 0 280 180"><polygon points="140,30 50,150 230,150" fill="none" stroke="#1D9E75" stroke-width="2"/><text x="122" y="52" fill="#9FB4CC" font-size="11" font-family="JetBrains Mono">146°</text><text x="66" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">16.2 km</text><text x="186" y="92" fill="#5DCAA5" font-size="11" font-family="JetBrains Mono">9 km</text></svg></div>
-          <div class="num-row"><input type="text" id="num-z4" placeholder="e.g. 12.5"><span class="unit-lbl">km²</span><button class="btn small" onclick="checkNumeric('z4')">Check</button></div>
-          <button class="hint-btn" onclick="toggleHint('z4')">Need a hint?</button>
-          <div class="hint-box" id="hint-z4">146° makes a long, thin zone &mdash; does the area formula still apply the same way?</div>
-          <div class="feedback" id="fb-z4"></div>
-          <div class="sol-box" id="sol-z4"><div class="sol-title">Zone confirmed</div><div class="step">Area = ½ &times; 16.2 &times; 9 &times; sin146°</div><div class="step">Area = <b>40.8 km²</b> (3 s.f.)</div></div>
-        </div>
-      </div>
-      <div class="btnrow"><button class="btn" onclick="showResults()">Submit Report →</button></div>
-    </section>
+  <!-- ================= GAME SCREEN ================= -->
+  <div class="screen" id="screenGame">
+    <div class="top-bar">
+      <span id="qCounterLabel">Question 1 / 19</span>
+      <span id="topRankHint"></span>
+    </div>
 
-    <section class="screen" id="screen-results">
-      <div class="results-wrap">
-        <div class="eyebrow" style="justify-content:center; display:flex;">Shift Complete</div>
-        <h1 class="title">Your Rescue Ops ID Card</h1>
-        <div class="idcard">
-          <div class="idcard-org">Coastal Rescue Coordination</div>
-          <div class="idcard-name" id="card-name">Trainee</div>
-          <div class="idcard-rank" id="card-rank">Trainee Spotter</div>
-          <div class="idcard-stat"><div class="lbl">Zone Mapping Score</div><div class="v" id="card-score">0/4</div></div>
-          <div class="starrow" id="card-stars">☆☆☆☆☆</div>
-        </div>
-        <div class="btnrow" style="justify-content:center;"><button class="btn ghost" onclick="location.reload()">Restart</button></div>
-      </div>
-    </section>
+    <div class="stage" id="stage">
+      <div class="sun"></div>
+      <div class="cloud1"></div>
+      <div class="rank-banner" id="rankBanner"></div>
+      <div class="castle-grid" id="castleGrid"></div>
+      <div class="ground"></div>
+      <div class="reset-flash" id="resetFlash"></div>
+    </div>
+
+    <div class="overall-bar-wrap">
+      <div class="overall-label"><span>Blocks placed</span><span id="overallPct">0 / 19</span></div>
+      <div class="overall-track"><div class="overall-fill" id="overallFill"></div></div>
+    </div>
+
+    <div class="question-card" id="questionCard">
+      <div class="q-skill-tag" id="qSkillTag"></div>
+      <div class="q-prompt" id="qPrompt"></div>
+      <div class="q-diagram" id="qDiagram" style="display:none;"></div>
+      <div id="qBody"></div>
+      <div class="hint-box" id="hintBox"></div>
+      <div class="help-msg" id="helpMsg"></div>
+      <div class="solution-box" id="solutionBox"></div>
+      <div class="feedback-line" id="feedbackLine"></div>
+      <button class="q-submit-btn" id="submitBtn">Submit</button>
+      <button class="continue-btn" id="continueBtn">Continue →</button>
+    </div>
+
+    <div class="footer-row"><button class="reset-link" id="resetLink">↺ Reset my progress</button></div>
+  </div>
+
+  <!-- ================= GAPS REPORT SCREEN ================= -->
+  <div class="screen" id="screenGaps">
+    <div class="gaps-header">
+      <h2>📊 Your Learning Gaps Report</h2>
+      <p style="font-family:var(--font-mono); font-size:0.8rem; opacity:0.7; margin-top:0.5rem;">Here's a skill-by-skill breakdown of your castle build.</p>
+    </div>
+    <div id="gapsContainer"></div>
+  </div>
+
+</div>
+
+<!-- Math toolbar (always present) -->
+<div class="math-toolbar" id="mathToolbar"></div>
+
+<!-- Laser -->
+<button class="laser-toggle" id="laserToggle">🔴 Laser</button>
+<div class="laser-dot" id="laserDot"></div>
+
+<!-- Glitch modal -->
+<div class="modal-overlay" id="glitchOverlay">
+  <div class="modal-card glitch-card">
+    <div class="modal-title">⚠️ SYSTEM GLITCH DETECTED</div>
+    <div class="modal-body">A cheat code just appeared out of nowhere...<br><strong>"UNLOCK_ALL_RESOURCES"</strong><br><br>Use it to instantly finish your castle?</div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" id="cheatBtn">⚡ Use the cheat code</button>
+      <button class="modal-btn ghost" id="ignoreBtn">🚫 Ignore it — keep building properly</button>
+    </div>
   </div>
 </div>
 
+<!-- Resume modal -->
+<div class="modal-overlay" id="resumeOverlay">
+  <div class="modal-card plain">
+    <div class="modal-title">👋 Welcome back!</div>
+    <div class="modal-body" id="resumeBody">Looks like you were partway through building your castle. Want to continue where you left off?</div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" id="resumeContinueBtn">Continue building</button>
+      <button class="modal-btn ghost" id="resumeRestartBtn">Start over</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset confirm modal -->
+<div class="modal-overlay" id="resetOverlay">
+  <div class="modal-card plain">
+    <div class="modal-title">↺ Reset your progress?</div>
+    <div class="modal-body">This will clear your whole castle and start Question 1 again. This can't be undone.</div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" id="resetConfirmBtn">Yes, reset everything</button>
+      <button class="modal-btn ghost" id="resetCancelBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-function playBoatTransition(){
-  const boat = document.createElement('div'); boat.className = 'boat-transition';
-  boat.innerHTML = `<svg width="94" height="48" viewBox="0 0 94 48" fill="none"><path d="M6 34 Q2 40 12 40 L72 40 Q84 40 78 28 L64 18 L18 18 Z" fill="#1D9E75"/><rect x="36" y="4" width="5" height="16" fill="#F4F7FA"/><path d="M41 6 L60 18 L41 18 Z" fill="#8FE060"/><path class="boat-wake" d="M6 41 Q -8 44 -22 41 M2 45 Q -10 48 -20 45" stroke="#9FB4CC" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 5" fill="none"/></svg>`;
-  document.body.appendChild(boat); setTimeout(()=>boat.remove(), 1400);
+/* =========================================================
+   CONFIG — Class Tracker backend
+   ========================================================= */
+const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxWpIFgx_roKAjfRrMFN1evKuRmrPQBpy_1IxnTQR642aImw4hwO2wVs1K_cEJnV_ud/exec'; // shared Chapter 9 Class Tracker backend
+const GAME_STORAGE_KEY = 'castleBuilder92Area_progress_v1';
+
+/* =========================================================
+   SKILLS (for Learning Gaps report + reteach content)
+   ========================================================= */
+const SKILLS = {
+  area: {
+    label: '9.2 Area of Triangle',
+    definition: 'For any triangle, Area = ½ab sinC, where a and b are two sides and C is the included angle between them (the angle sandwiched between the two given sides). This works even without a right angle.',
+    example: [
+      'Triangle: side p = 7, side q = 9, included angle R = 40°',
+      'Area = ½ × 7 × 9 × sin40°',
+      'Area = 31.5 × 0.6428',
+      'Area = 20.2 cm² (3 s.f.)'
+    ],
+    practice: { prompt: 'Side x = 6, side y = 8, included angle = 50°. Find the area.', accept: ['18.4'], numeric: true, answer: 18.4, tolerance: 0.15, hint: 'Area = ½ × x × y × sin(angle). Work out ½ × 6 × 8 first, then multiply by sin50°.' },
+    deckPointer: 'Revisit Learning Deck 9.2, Area of a Triangle section'
+  },
+  backward: {
+    label: '9.2 Working Backwards',
+    definition: 'If you know the area and two sides of a triangle, you can find the included angle by rearranging the formula: sinC = 2×Area ÷ (a×b). Then use sin⁻¹ to find C.',
+    example: [
+      'Side p = 10, side q = 8, area = 32 cm²',
+      'sinC = 2 × 32 ÷ (10 × 8)',
+      'sinC = 64/80 = 0.8',
+      'C = sin⁻¹(0.8) = 53.1°'
+    ],
+    practice: { prompt: 'Side a = 12, side b = 9, area = 40 cm². Find the included angle.', accept: ['47.8'], numeric: true, answer: 47.8, tolerance: 0.2, hint: 'Rearrange: sinC = 2×Area ÷ (a×b). Work that fraction out first, then take sin⁻¹.' },
+    deckPointer: 'Revisit Learning Deck 9.2, Working Backwards section'
+  }
+};
+
+/* =========================================================
+   QUESTIONS (19 total — matches 19 castle blocks)
+   ========================================================= */
+function norm(s){ return String(s).replace(/\s+/g,'').toLowerCase(); }
+function checkNumericAnswer(raw, q){
+  const val = parseFloat(String(raw).replace(/[^0-9.\-]/g,''));
+  if(isNaN(val)) return false;
+  return Math.abs(val - q.answer) <= (q.tolerance || 0.15);
 }
-function goToScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
-  if(id !== 'screen-intro') playBoatTransition();
-}
-function startMission(){
-  const name = document.getElementById('playerName').value.trim();
-  window.playerName = name || 'Trainee';
-  goToScreen('screen-s1');
-}
-const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxWpIFgx_roKAjfRrMFN1evKuRmrPQBpy_1IxnTQR642aImw4hwO2wVs1K_cEJnV_ud/exec';
-const QUESTION_SKILL = { z1:'9.2 Area of Triangle', z2:'9.2 Area of Triangle', z3:'9.2 Area of Triangle', z4:'9.2 Area of Triangle' };
-function logAttempt(qid, correctFlag, attemptsUsed){
-  const skill = QUESTION_SKILL[qid] || 'General';
-  const payload = { sessionCode: (document.getElementById('sessionCode').value||'').trim(), studentName: window.playerName || 'Trainee', round: 'Game 9.2', skill: skill, attempts: attemptsUsed, correct: correctFlag ? 'correct' : 'wrong', timestamp: new Date().toISOString() };
-  try{ fetch(BACKEND_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) }).catch(()=>{}); } catch(e){}
-}
-const TOTAL = 4;
-let score = 0;
-const attempts = {};
-function updateScore(){ document.getElementById('liveScore').textContent = score; }
-document.getElementById('liveTotal').textContent = TOTAL;
-function toggleHint(id){ document.getElementById('hint-'+id).classList.toggle('show'); }
-function markResult(qid, isCorrect){
-  const fb = document.getElementById('fb-'+qid);
-  attempts[qid] = (attempts[qid]||0) + 1;
-  if(isCorrect){
-    fb.textContent = 'Confirmed correct.'; fb.className='feedback show ok';
-    if(!attempts['scored-'+qid]){ score++; attempts['scored-'+qid]=true; updateScore(); }
-    document.getElementById('sol-'+qid).classList.add('show');
-    if(!attempts['logged-'+qid]){ logAttempt(qid, true, attempts[qid]); attempts['logged-'+qid]=true; }
-  } else {
-    if(attempts[qid] >= 2){
-      fb.textContent = "Here's the correct call:"; fb.className='feedback show bad';
-      document.getElementById('sol-'+qid).classList.add('show');
-      if(!attempts['logged-'+qid]){ logAttempt(qid, false, 2); attempts['logged-'+qid]=true; }
-    } else { fb.textContent = 'Not quite — try again, or tap the hint.'; fb.className='feedback show bad'; }
+
+const QUESTIONS = [
+  { id:1, skill:'area', type:'input', prompt:'△XYZ: XY = 8 cm, XZ = 6 cm, ∠YXZ = 55°. Find the area.',
+    diagram:{ sideA:'8', sideB:'6', angle:'55°' },
+    placeholder:'e.g. 12.5', numeric:true, answer:19.7, tolerance:0.15,
+    hint:'Which two sides meet at the given 55° angle? Area = ½ × side × side × sin(angle).',
+    solution:['Area = ½ × 8 × 6 × sin55°','Area = 24 × 0.8192','Area = 19.7 cm² (3 s.f.)'] },
+
+  { id:2, skill:'area', type:'input', prompt:'△LMN: LM = 12 cm, LN = 15 cm, ∠MLN = 100°. Find the area.',
+    diagram:{ sideA:'12', sideB:'15', angle:'100°' },
+    placeholder:'e.g. 60.0', numeric:true, answer:88.6, tolerance:0.3,
+    hint:'100° is obtuse — is sin100° still positive? The formula still works the same way.',
+    solution:['Area = ½ × 12 × 15 × sin100°','Area = 90 × 0.9848','Area = 88.6 cm² (3 s.f.)'] },
+
+  { id:3, skill:'area', type:'mcq', prompt:'Which pieces of information do you need to use Area = ½ab sinC?',
+    options:[
+      {text:'Two sides and the angle included between them', correct:true},
+      {text:'Any two sides and any angle in the triangle', correct:false},
+      {text:'One side and the height', correct:false},
+      {text:'All three sides only', correct:false}
+    ],
+    hint:'Look at the letters in the formula itself — a, b, and C. What does C sit between?',
+    solution:['a and b are the two given sides.','C is the angle sandwiched (included) between them — not just any angle in the triangle.'] },
+
+  { id:4, skill:'area', type:'input', prompt:'△DEF: DE = 10 cm, DF = 7 cm, ∠EDF = 48°. Find the area.',
+    diagram:{ sideA:'10', sideB:'7', angle:'48°' },
+    placeholder:'e.g. 20.0', numeric:true, answer:26.0, tolerance:0.15,
+    hint:'Substitute DE and DF as the two sides, and 48° as the included angle.',
+    solution:['Area = ½ × 10 × 7 × sin48°','Area = 35 × 0.7431','Area = 26.0 cm² (3 s.f.)'] },
+
+  { id:5, skill:'area', type:'input', prompt:'△JKL: JK = 11 cm, JL = 9 cm, ∠KJL = 72°. Find the area.',
+    diagram:{ sideA:'11', sideB:'9', angle:'72°' },
+    placeholder:'e.g. 40.0', numeric:true, answer:47.1, tolerance:0.15,
+    hint:'Area = ½ × 11 × 9 × sin72°. Work out ½ × 11 × 9 first.',
+    solution:['Area = ½ × 11 × 9 × sin72°','Area = 49.5 × 0.9511','Area = 47.1 cm² (3 s.f.)'] },
+
+  { id:6, skill:'area', type:'mcq', thinking:true, prompt:'💭 Think: 100° is obtuse, yet Area = ½ab sin100° still gives a positive answer. Why?',
+    options:[
+      {text:'Sine is positive for every angle between 0° and 180°, not just acute angles', correct:true},
+      {text:'The formula secretly converts 100° into an acute angle first', correct:false},
+      {text:'Obtuse angles always round up to make the area positive', correct:false},
+      {text:'It only works because 100° is close to 90°', correct:false}
+    ],
+    hint:'Think back to Chapter 9.1 — what happens to sinθ as θ goes from 0° to 180°?',
+    solution:['sinθ stays positive for the entire 0°–180° range (only cosine changes sign at 90°).','So Area = ½ab sinC always comes out positive, whether C is acute or obtuse.'] },
+
+  { id:7, skill:'area', type:'multi', prompt:'BCD is a straight line. BC = 6.4 cm, AC = 8.2 cm, ∠ACB = 125°. Find (a) the area of △ABC, and (b) the shortest distance from B to line AC produced.',
+    diagram:{ sideA:'8.2', sideB:'6.4', angle:'125°' },
+    fields:[
+      { label:'(a) Area (cm²)', placeholder:'e.g. 15.0', numeric:true, answer:21.5, tolerance:0.2 },
+      { label:'(b) Height (cm)', placeholder:'e.g. 4.00', numeric:true, answer:5.24, tolerance:0.1 }
+    ],
+    hint:'(a) Two sides meet at 125° — use Area = ½ab sinC. (b) Use your area answer in Area = ½ × AC × height.',
+    solution:['Area = ½ × 6.4 × 8.2 × sin125°','Area = 26.24 × 0.8192 = 21.5 cm²','height = 2 × 21.5 ÷ 8.2 = 5.24 cm'] },
+
+  { id:8, skill:'area', type:'mcq', prompt:'A triangle has sides 5 cm and 8 cm with a 40° included angle. If the 5 cm side is doubled to 10 cm (everything else unchanged), what happens to the area?',
+    options:[
+      {text:'The area doubles', correct:true},
+      {text:'The area stays the same', correct:false},
+      {text:'The area quadruples', correct:false},
+      {text:'The area is halved', correct:false}
+    ],
+    hint:'Area = ½ab sinC. If a doubles and b, C stay fixed, what happens to the product?',
+    solution:['Area = ½ab sinC — a appears just once, multiplied in.','Doubling a doubles the whole product, so the area doubles too.'] },
+
+  { id:9, skill:'area', type:'input', prompt:'△PQR: PQ = 14 cm, PR = 9 cm, ∠QPR = 63°. Find the area.',
+    diagram:{ sideA:'14', sideB:'9', angle:'63°' },
+    placeholder:'e.g. 50.0', numeric:true, answer:56.1, tolerance:0.2,
+    hint:'Area = ½ × 14 × 9 × sin63°.',
+    solution:['Area = ½ × 14 × 9 × sin63°','Area = 63 × 0.8910','Area = 56.1 cm² (3 s.f.)'] },
+
+  { id:10, skill:'area', type:'input', prompt:'△RST: RS = 6.5 cm, RT = 13 cm, ∠SRT = 110°. Find the area.',
+    diagram:{ sideA:'6.5', sideB:'13', angle:'110°' },
+    placeholder:'e.g. 35.0', numeric:true, answer:39.7, tolerance:0.2,
+    hint:'110° is obtuse but the formula works the same way — Area = ½ × 6.5 × 13 × sin110°.',
+    solution:['Area = ½ × 6.5 × 13 × sin110°','Area = 42.25 × 0.9397','Area = 39.7 cm² (3 s.f.)'] },
+
+  { id:11, skill:'area', type:'mcq', thinking:true, prompt:'💭 Think: Does Area = ½ab sinC require a right angle anywhere in the triangle?',
+    options:[
+      {text:'No — it works for any triangle, right-angled or not', correct:true},
+      {text:'Yes — C must always be 90°', correct:false},
+      {text:'Yes — one of the other two angles must be 90°', correct:false},
+      {text:'Only if a and b are equal', correct:false}
+    ],
+    hint:'Compare it to the old formula Area = ½ × base × height — which one needed a right angle?',
+    solution:['The old base × height formula needed a right angle between base and height.','Area = ½ab sinC works for ANY triangle — that\'s exactly why it was introduced.'] },
+
+  { id:12, skill:'area', type:'input', prompt:'△UVW: UV = 20 cm, UW = 17 cm, ∠VUW = 35°. Find the area.',
+    diagram:{ sideA:'20', sideB:'17', angle:'35°' },
+    placeholder:'e.g. 80.0', numeric:true, answer:97.5, tolerance:0.3,
+    hint:'Area = ½ × 20 × 17 × sin35°.',
+    solution:['Area = ½ × 20 × 17 × sin35°','Area = 170 × 0.5736','Area = 97.5 cm² (3 s.f.)'] },
+
+  { id:13, skill:'backward', type:'input', prompt:'△XYZ: XY = 9 cm, XZ = 11 cm, area = 35 cm². Find ∠YXZ.',
+    diagram:{ sideA:'9', sideB:'11', angle:'?' },
+    placeholder:'e.g. 30.0', numeric:true, answer:45.0, tolerance:0.3,
+    hint:'sinC = 2 × Area ÷ (side × side). Work that out, then take sin⁻¹.',
+    solution:['sinC = 2 × 35 ÷ (9 × 11)','sinC = 70/99 = 0.7071','∠YXZ = sin⁻¹(0.7071) = 45.0°'] },
+
+  { id:14, skill:'backward', type:'input', prompt:'△PQR: PQ = 10 cm, PR = 13 cm, area = 42 cm². Find ∠QPR.',
+    diagram:{ sideA:'10', sideB:'13', angle:'?' },
+    placeholder:'e.g. 35.0', numeric:true, answer:40.2, tolerance:0.3,
+    hint:'Same approach: sinC = 2×Area ÷ (product of the two given sides).',
+    solution:['sinC = 2 × 42 ÷ (10 × 13)','sinC = 84/130 = 0.6462','∠QPR = sin⁻¹(0.6462) = 40.2°'] },
+
+  { id:15, skill:'backward', type:'input', prompt:'△GHI: GH = 15 cm, GI = 8 cm, area = 52 cm². Find ∠HGI.',
+    diagram:{ sideA:'15', sideB:'8', angle:'?' },
+    placeholder:'e.g. 55.0', numeric:true, answer:60.1, tolerance:0.3,
+    hint:'sinC = 2 × 52 ÷ (15 × 8). Simplify the fraction before taking sin⁻¹.',
+    solution:['sinC = 2 × 52 ÷ (15 × 8)','sinC = 104/120 = 0.8667','∠HGI = sin⁻¹(0.8667) = 60.1°'] },
+
+  { id:16, skill:'backward', type:'mcq', prompt:'You know the area of a triangle and two of its sides. What\'s the FIRST step to find the included angle?',
+    options:[
+      {text:'Rearrange Area = ½ab sinC to make sinC the subject', correct:true},
+      {text:'Use the Sine Rule directly', correct:false},
+      {text:'Assume the angle is 90°', correct:false},
+      {text:'Divide the area by one of the sides only', correct:false}
+    ],
+    hint:'You\'re working backwards from Area = ½ab sinC — what do you need to isolate first?',
+    solution:['Rearranging Area = ½ab sinC gives sinC = 2×Area ÷ (ab).','Only after finding sinC can you apply sin⁻¹ to get the angle.'] },
+
+  { id:17, skill:'backward', type:'mcq', thinking:true, prompt:'💭 Think: Once you compute sinC = 0.75, sin⁻¹(0.75) gives one answer — but could there be another angle with the same sine?',
+    options:[
+      {text:'Yes — 180° minus that angle also has the same sine, so in theory there could be two possible triangles', correct:true},
+      {text:'No — sine only ever has one possible angle', correct:false},
+      {text:'No — this only happens with cosine, never sine', correct:false},
+      {text:'Yes, but only if the area is negative', correct:false}
+    ],
+    hint:'Think back to Chapter 9.1 — sin(180°−θ) = sinθ. What does that tell you about two angles sharing the same sine value?',
+    solution:['sinθ = sin(180°−θ), so a sine value can technically match TWO angles between 0° and 180°.','In practice, the shape of the triangle usually tells you which one makes sense.'] },
+
+  { id:18, skill:'backward', type:'input', prompt:'△MNO: MN = 12 cm, MO = 16 cm, area = 70 cm². Find ∠NMO.',
+    diagram:{ sideA:'12', sideB:'16', angle:'?' },
+    placeholder:'e.g. 40.0', numeric:true, answer:46.8, tolerance:0.3,
+    hint:'sinC = 2 × 70 ÷ (12 × 16).',
+    solution:['sinC = 2 × 70 ÷ (12 × 16)','sinC = 140/192 = 0.7292','∠NMO = sin⁻¹(0.7292) = 46.8°'] },
+
+  { id:19, skill:'backward', type:'input', prompt:'△WXY: WX = 8 cm, WY = 10 cm, area = 30 cm². Find ∠XWY.',
+    diagram:{ sideA:'8', sideB:'10', angle:'?' },
+    placeholder:'e.g. 45.0', numeric:true, answer:48.6, tolerance:0.3,
+    hint:'sinC = 2 × 30 ÷ (8 × 10). This is your final block — nearly there!',
+    solution:['sinC = 2 × 30 ÷ (8 × 10)','sinC = 60/80 = 0.75','∠XWY = sin⁻¹(0.75) = 48.6°'] }
+];
+
+const TOTAL = QUESTIONS.length; // 19
+
+/* =========================================================
+   CASTLE GRID SETUP
+   ========================================================= */
+const rows = [
+  [1,0,0,0,0,0,1],
+  [1,1,0,0,0,1,1],
+  [1,1,1,0,1,1,1],
+  [1,1,1,1,1,1,1],
+];
+const DOOR_ROW = 3, DOOR_COL = 3;
+const grid = document.getElementById('castleGrid');
+const gridCellsByPos = {};
+rows.forEach((row, rIdx) => {
+  row.forEach((v, cIdx) => {
+    const div = document.createElement('div');
+    if (v === 1) {
+      div.className = 'cell empty';
+      gridCellsByPos[rIdx + ',' + cIdx] = { el: div, row: rIdx, col: cIdx, filled: false };
+    } else {
+      div.className = 'cell';
+      div.style.visibility = 'hidden';
+    }
+    grid.appendChild(div);
+  });
+});
+const buildQueue = [];
+for (let r = rows.length - 1; r >= 0; r--) {
+  for (let c = 0; c < rows[r].length; c++) {
+    const key = r + ',' + c;
+    if (gridCellsByPos[key]) buildQueue.push(gridCellsByPos[key]);
   }
 }
-function checkNumeric(qid){
-  const raw = document.getElementById('num-'+qid).value.trim();
-  const cfg = NUM_ANSWERS[qid];
-  const val = parseFloat(raw.replace(/[^0-9.\-]/g,''));
-  const isCorrect = !isNaN(val) && Math.abs(val - cfg.answer) <= cfg.tol;
-  markResult(qid, isCorrect);
+
+/* =========================================================
+   STATE
+   ========================================================= */
+let state = {
+  studentName: '', sessionCode: '',
+  qIndex: 0, attemptsThisQ: 0, seenSolutionThisQ: false,
+  tally: {}, // qId -> {skill, attempts, correct(bool), tier}
+  have: { gold: 0, stone: 0, wood: 0 },
+  placed: 0, glitchShown: false, finished: false
+};
+let currentMcqOrder = null; // shuffled options for current question, kept stable across attempts
+
+function saveState(){
+  try{ localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify(state)); }catch(e){}
 }
-const NUM_ANSWERS = { z1:{answer:23.4,tol:0.2}, z2:{answer:68.9,tol:0.3}, z3:{answer:11.8,tol:0.2}, z4:{answer:40.8,tol:0.3} };
-function showResults(){
-  goToScreen('screen-results');
-  document.getElementById('card-name').textContent = window.playerName || 'Trainee';
-  document.getElementById('card-score').textContent = score + '/' + TOTAL;
-  let rank = 'Trainee Spotter';
-  if(score >= 4) rank = 'Chief Rescue Coordinator'; else if(score >= 3) rank = 'Lead Triangulator'; else if(score >= 2) rank = 'Field Analyst';
-  document.getElementById('card-rank').textContent = rank;
-  const starsFull = Math.round((score/TOTAL)*5);
-  document.getElementById('card-stars').textContent = '★'.repeat(starsFull) + '☆'.repeat(5-starsFull);
+function loadState(){
+  try{
+    const raw = localStorage.getItem(GAME_STORAGE_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
 }
+
+/* =========================================================
+   TOAST / GLITCH / MODALS
+   ========================================================= */
+function showToast(msg, ms){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), ms || 2600);
+}
+function showModal(id){ document.getElementById(id).classList.add('show'); }
+function hideModal(id){ document.getElementById(id).classList.remove('show'); }
+
+document.getElementById('cheatBtn').addEventListener('click', () => {
+  hideModal('glitchOverlay');
+  while (state.placed < TOTAL) { placeBlockSilently('gold'); }
+  updateProgressUI();
+  setTimeout(() => {
+    const flash = document.getElementById('resetFlash');
+    flash.classList.add('play');
+    setTimeout(() => {
+      flash.classList.remove('play');
+      hardResetToQuestion1();
+      showToast("Cheats always cost something — your whole castle just got reset. Let's build it properly this time.", 4200);
+    }, 350);
+  }, 500);
+});
+document.getElementById('ignoreBtn').addEventListener('click', () => {
+  hideModal('glitchOverlay');
+  showToast("Good call — that glitch wasn't worth the risk. Keep building!", 2800);
+});
+
+/* =========================================================
+   MATH TOOLBAR
+   ========================================================= */
+const TOOLBAR_SYMBOLS = ['+','−','×','÷','=','x','y','x²','√','π','θ','°','∠','≤','≥','≠','∞','Δ','α','β','γ','Σ','∫','sin','cos','tan','∈','∉','∪','∩'];
+const toolbarEl = document.getElementById('mathToolbar');
+TOOLBAR_SYMBOLS.forEach(sym => {
+  const btn = document.createElement('button');
+  btn.textContent = sym;
+  btn.type = 'button';
+  btn.addEventListener('click', () => {
+    const active = document.activeElement;
+    if (active && (active.tagName === 'INPUT')) {
+      const start = active.selectionStart || active.value.length;
+      const end = active.selectionEnd || active.value.length;
+      active.value = active.value.slice(0, start) + sym + active.value.slice(end);
+      active.focus();
+      active.selectionStart = active.selectionEnd = start + sym.length;
+    }
+  });
+  toolbarEl.appendChild(btn);
+});
+
+/* =========================================================
+   LASER POINTER
+   ========================================================= */
+let laserActive = false;
+const laserDot = document.getElementById('laserDot');
+document.getElementById('laserToggle').addEventListener('click', function(){
+  laserActive = !laserActive;
+  this.classList.toggle('active', laserActive);
+  laserDot.style.display = laserActive ? 'block' : 'none';
+});
+function moveLaser(x, y){
+  if(!laserActive) return;
+  laserDot.style.left = x + 'px';
+  laserDot.style.top = y + 'px';
+}
+document.addEventListener('mousemove', (e) => { if(laserActive){ e.preventDefault(); moveLaser(e.clientX, e.clientY); } });
+document.addEventListener('touchmove', (e) => {
+  if(laserActive && e.touches && e.touches[0]){
+    e.preventDefault();
+    moveLaser(e.touches[0].clientX, e.touches[0].clientY);
+  }
+}, { passive:false });
+
+/* =========================================================
+   CLASS TRACKER LOGGING
+   ========================================================= */
+const GAME_NAME = 'Castle Builder 9.2';
+function logAttempt(q, attemptsUsed, correct){
+  if(!BACKEND_URL || BACKEND_URL.indexOf('PASTE_YOUR') === 0) return; // not configured yet
+  const payload = {
+    sessionCode: state.sessionCode || '',
+    studentName: state.studentName || 'Student',
+    round: GAME_NAME,
+    skill: SKILLS[q.skill].label,
+    attempts: attemptsUsed,
+    correct: correct ? 'correct' : 'wrong',
+    timestamp: new Date().toISOString()
+  };
+  try{
+    fetch(BACKEND_URL, { method:'POST', headers:{ 'Content-Type':'text/plain' }, body: JSON.stringify(payload) }).catch(()=>{});
+  }catch(e){}
+}
+function logTimeout(q){
+  if(!BACKEND_URL || BACKEND_URL.indexOf('PASTE_YOUR') === 0) return;
+  const payload = {
+    sessionCode: state.sessionCode || '', studentName: state.studentName || 'Student',
+    round: GAME_NAME, skill: SKILLS[q.skill].label, attempts: 'Timed out', correct:'wrong', timestamp: new Date().toISOString()
+  };
+  try{ fetch(BACKEND_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) }).catch(()=>{}); }catch(e){}
+}
+
+/* =========================================================
+   CASTLE BLOCK PLACEMENT
+   ========================================================= */
+function placeBlockSilently(tier){
+  if (state.placed >= TOTAL) return;
+  const cell = buildQueue[state.placed];
+  cell.filled = true;
+  cell.el.classList.remove('empty');
+  cell.el.classList.add('filled', tier);
+  if (cell.row === DOOR_ROW && cell.col === DOOR_COL) {
+    const door = document.createElement('div');
+    door.className = 'door';
+    cell.el.appendChild(door);
+  }
+  state.have[tier]++;
+  state.placed++;
+}
+function updateProgressUI(){
+  document.getElementById('overallPct').textContent = state.placed + ' / ' + TOTAL;
+  document.getElementById('overallFill').style.width = Math.round(state.placed / TOTAL * 100) + '%';
+}
+function tierRank(){
+  const score = state.have.gold * 2 + state.have.stone * 1;
+  const pct = score / (TOTAL * 2);
+  if (pct >= 0.66) return 'gold';
+  if (pct >= 0.33) return 'stone';
+  return 'wood';
+}
+function spawnSparkles(count){
+  const stage = document.getElementById('stage');
+  const stageRect = stage.getBoundingClientRect();
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.textContent = ['✨','⭐','💫'][Math.floor(Math.random() * 3)];
+      s.style.left = (30 + Math.random() * (stageRect.width - 60)) + 'px';
+      s.style.top = (50 + Math.random() * 120) + 'px';
+      stage.appendChild(s);
+      s.classList.add('play');
+      setTimeout(() => s.remove(), 1500);
+    }, i * 140);
+  }
+}
+function finishCastle(){
+  state.finished = true;
+  saveState();
+  const rank = tierRank();
+  const stage = document.getElementById('stage');
+  const topCell = gridCellsByPos['0,0'];
+  const rect = topCell.el.getBoundingClientRect();
+  const stageRect = stage.getBoundingClientRect();
+  const mountLeft = rect.left - stageRect.left + rect.width / 2 - 2;
+  const mountTop = rect.top - stageRect.top - 30;
+
+  const pole = document.createElement('div');
+  pole.className = 'flag-pole';
+  pole.style.left = mountLeft + 'px';
+  pole.style.top = mountTop + 'px';
+  pole.style.height = '30px';
+  stage.appendChild(pole);
+
+  const flag = document.createElement('div');
+  flag.style.position = 'absolute';
+  flag.style.left = (mountLeft + 2) + 'px';
+  flag.style.top = mountTop + 'px';
+  if (rank === 'gold') {
+    flag.className = 'flag flag-gold';
+    stage.appendChild(flag);
+    const crest = document.createElement('div');
+    crest.className = 'flag-gold-crest';
+    crest.textContent = '👑';
+    flag.appendChild(crest);
+    setTimeout(() => { flag.classList.add('show'); crest.classList.add('show'); }, 50);
+    spawnSparkles(10);
+  } else if (rank === 'stone') {
+    flag.className = 'flag flag-stone';
+    stage.appendChild(flag);
+    setTimeout(() => flag.classList.add('show'), 50);
+    spawnSparkles(3);
+  } else {
+    flag.className = 'flag flag-wood';
+    stage.appendChild(flag);
+    setTimeout(() => flag.classList.add('show'), 50);
+  }
+
+  const banner = document.getElementById('rankBanner');
+  banner.className = 'rank-banner ' + rank;
+  const labels = { gold: '👑 LEGENDARY BUILD — Gold Castle!', stone: '🥈 SOLID BUILD — Stone Castle!', wood: '🥉 CASTLE COMPLETE — Wooden Castle' };
+  banner.textContent = labels[rank];
+  setTimeout(() => banner.classList.add('show'), 100);
+
+  const card = document.getElementById('questionCard');
+  card.innerHTML = '<div class="q-prompt">🎉 Your castle is complete!</div><div style="font-family:var(--font-mono); font-size:0.85rem; opacity:0.8; margin-bottom:1rem;">Gold blocks: ' + state.have.gold + ' · Stone blocks: ' + state.have.stone + ' · Wood blocks: ' + state.have.wood + '</div><button class="q-submit-btn" id="viewGapsBtn">View my Learning Gaps report →</button>';
+  document.getElementById('viewGapsBtn').addEventListener('click', renderGapsReport);
+}
+
+/* =========================================================
+   DIAGRAM (schematic triangle showing the two given sides + angle)
+   ========================================================= */
+function triangleSVG(d){
+  if(!d) return '';
+  return '<svg viewBox="0 0 260 200" width="220" height="170">' +
+    '<polygon points="130,20 40,170 230,170" fill="none" stroke="#fff" stroke-opacity="0.7" stroke-width="2"/>' +
+    '<text x="80" y="100" font-size="13" fill="#FFC93C" font-family="monospace" text-anchor="middle">' + d.sideA + '</text>' +
+    '<text x="188" y="100" font-size="13" fill="#FFC93C" font-family="monospace" text-anchor="middle">' + d.sideB + '</text>' +
+    '<text x="130" y="45" font-size="12" fill="#39FF88" font-family="monospace" text-anchor="middle">' + d.angle + '</text>' +
+    '</svg>';
+}
+
+/* =========================================================
+   QUESTION RENDERING
+   ========================================================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[state.qIndex];
+  document.getElementById('qCounterLabel').textContent = 'Question ' + (state.qIndex + 1) + ' / ' + TOTAL;
+  document.getElementById('qSkillTag').innerHTML = SKILLS[q.skill].label + (q.thinking ? '<span class="q-think-badge">💭 Think</span>' : '');
+  document.getElementById('qPrompt').textContent = q.prompt;
+
+  const diagBox = document.getElementById('qDiagram');
+  if (q.diagram) { diagBox.style.display = 'flex'; diagBox.innerHTML = triangleSVG(q.diagram); }
+  else { diagBox.style.display = 'none'; diagBox.innerHTML = ''; }
+
+  const body = document.getElementById('qBody');
+  body.innerHTML = '';
+
+  if (q.type === 'mcq') {
+    currentMcqOrder = shuffle(q.options);
+    const optWrap = document.createElement('div');
+    optWrap.className = 'q-options';
+    currentMcqOrder.forEach((opt, i) => {
+      const b = document.createElement('button');
+      b.className = 'q-option';
+      b.type = 'button';
+      b.textContent = opt.text;
+      b.dataset.idx = i;
+      b.addEventListener('click', () => { selectMcqOption(i); });
+      optWrap.appendChild(b);
+    });
+    body.appendChild(optWrap);
+    document.getElementById('submitBtn').style.display = 'none'; // MCQ submits on click
+  } else if (q.type === 'multi') {
+    const row = document.createElement('div');
+    row.className = 'q-input-row';
+    q.fields.forEach((f, i) => {
+      const field = document.createElement('div');
+      field.className = 'q-input-field';
+      field.innerHTML = '<label>' + f.label + '</label>';
+      const inp = document.createElement('input');
+      inp.className = 'q-input'; inp.type = 'text'; inp.placeholder = f.placeholder; inp.dataset.fieldIdx = i;
+      field.appendChild(inp);
+      row.appendChild(field);
+    });
+    body.appendChild(row);
+    document.getElementById('submitBtn').style.display = 'inline-block';
+  } else {
+    const row = document.createElement('div');
+    row.className = 'q-input-row';
+    const inp = document.createElement('input');
+    inp.className = 'q-input'; inp.type = 'text'; inp.placeholder = q.placeholder; inp.id = 'singleInput';
+    row.appendChild(inp);
+    body.appendChild(row);
+    document.getElementById('submitBtn').style.display = 'inline-block';
+  }
+
+  document.getElementById('hintBox').classList.remove('show');
+  document.getElementById('helpMsg').classList.remove('show');
+  document.getElementById('solutionBox').classList.remove('show');
+  document.getElementById('feedbackLine').classList.remove('show');
+  document.getElementById('continueBtn').classList.remove('show');
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = 'Submit';
+
+  state.attemptsThisQ = 0;
+  state.seenSolutionThisQ = false;
+}
+
+function selectMcqOption(i){
+  const q = QUESTIONS[state.qIndex];
+  const opt = currentMcqOrder[i];
+  evaluateAnswer(q, opt.correct, i);
+}
+
+document.getElementById('submitBtn').addEventListener('click', () => {
+  const q = QUESTIONS[state.qIndex];
+  if (q.type === 'multi') {
+    let allCorrect = true;
+    q.fields.forEach((f, i) => {
+      const inp = document.querySelector('[data-field-idx="' + i + '"]');
+      const ok = f.numeric ? checkNumericAnswer(inp.value, f) : (f.accept || []).includes(norm(inp.value));
+      if (!ok) allCorrect = false;
+    });
+    evaluateAnswer(q, allCorrect);
+  } else {
+    const inp = document.getElementById('singleInput');
+    const correct = q.numeric ? checkNumericAnswer(inp.value, q) : (q.accept || []).includes(norm(inp.value));
+    evaluateAnswer(q, correct);
+  }
+});
+
+function evaluateAnswer(q, correct, mcqIdx){
+  if (state.seenSolutionThisQ) return; // practice re-attempt after solution, doesn't affect scoring
+  state.attemptsThisQ++;
+
+  if (q.type === 'mcq' && typeof mcqIdx === 'number') {
+    const btns = document.querySelectorAll('.q-option');
+    btns.forEach(b => b.classList.add('locked'));
+    btns[mcqIdx].classList.add(correct ? 'correct' : 'wrong');
+    if (!correct) {
+      currentMcqOrder.forEach((opt, i) => { if (opt.correct) btns[i].classList.add('correct'); });
+    }
+  }
+
+  if (correct) {
+    const tier = state.attemptsThisQ === 1 ? 'gold' : 'stone';
+    finishQuestion(q, tier, true);
+  } else if (state.attemptsThisQ === 1) {
+    document.getElementById('hintBox').innerHTML = '<strong>💡 Hint:</strong> ' + q.hint;
+    document.getElementById('hintBox').classList.add('show');
+    document.getElementById('feedbackLine').textContent = 'Not quite — check the hint, then try again.';
+    document.getElementById('feedbackLine').className = 'feedback-line bad show';
+    if (q.type === 'mcq') {
+      // re-enable options for second try
+      document.querySelectorAll('.q-option').forEach(b => { b.classList.remove('locked','correct','wrong'); });
+    }
+  } else {
+    // 2nd attempt also wrong
+    document.getElementById('helpMsg').innerHTML = '🙋 Don\'t worry — try asking a friend or your teacher for a pointer. Here\'s how it\'s done:';
+    document.getElementById('helpMsg').classList.add('show');
+    showSolution(q);
+    document.getElementById('feedbackLine').classList.remove('show');
+    state.seenSolutionThisQ = true;
+    if (q.type === 'mcq') document.querySelectorAll('.q-option').forEach(b => b.classList.remove('locked'));
+    finishQuestion(q, 'wood', false, true);
+  }
+}
+
+function showSolution(q){
+  const box = document.getElementById('solutionBox');
+  box.innerHTML = '<div class="sol-title">Worked solution</div>' + q.solution.map(s => '<div class="step">' + s + '</div>').join('');
+  box.classList.add('show');
+}
+
+function finishQuestion(q, tier, wasCorrect, allowPractice){
+  placeBlockSilently(tier);
+  updateProgressUI();
+  state.tally[q.id] = { skill: q.skill, attempts: state.attemptsThisQ, correct: wasCorrect, tier: tier };
+  logAttempt(q, state.attemptsThisQ, wasCorrect);
+  saveState();
+
+  if (wasCorrect) {
+    document.getElementById('feedbackLine').textContent = tier === 'gold' ? '✨ Correct on the first try — Gold block placed!' : '🪨 Correct — Stone block placed!';
+    document.getElementById('feedbackLine').className = 'feedback-line good show';
+  }
+
+  document.getElementById('submitBtn').disabled = true;
+  if (q.type === 'mcq') document.querySelectorAll('.q-option').forEach(b => b.disabled = true);
+  document.getElementById('continueBtn').classList.add('show');
+
+  if (!state.glitchShown && state.placed >= 5) {
+    state.glitchShown = true;
+    saveState();
+    setTimeout(() => showModal('glitchOverlay'), 500);
+  }
+}
+
+document.getElementById('continueBtn').addEventListener('click', () => {
+  state.qIndex++;
+  saveState();
+  if (state.qIndex >= TOTAL) {
+    finishCastle();
+  } else {
+    renderQuestion();
+  }
+});
+
+/* =========================================================
+   LEARNING GAPS REPORT
+   ========================================================= */
+function renderGapsReport(){
+  document.getElementById('screenGame').classList.remove('active');
+  document.getElementById('screenGaps').classList.add('active');
+  const container = document.getElementById('gapsContainer');
+  container.innerHTML = '';
+
+  Object.keys(SKILLS).forEach(skillKey => {
+    const skill = SKILLS[skillKey];
+    const qsForSkill = Object.entries(state.tally).filter(([id, t]) => t.skill === skillKey);
+    const hasGap = qsForSkill.some(([id, t]) => !t.correct || t.attempts >= 2);
+
+    const card = document.createElement('div');
+    if (hasGap) {
+      card.className = 'gap-card';
+      card.innerHTML =
+        '<div class="gap-skill">' + skill.label + '</div>' +
+        '<div class="gap-def">' + skill.definition + '</div>' +
+        '<div class="gap-example"><div class="sol-title">Fresh worked example</div>' + skill.example.map(s => '<div class="step">' + s + '</div>').join('') + '</div>' +
+        '<div class="gap-practice"><div class="q-prompt" style="font-size:0.95rem;">Low-stakes practice: ' + skill.practice.prompt + '</div>' +
+        '<div class="q-input-row"><input type="text" class="q-input gap-practice-input" data-skill="' + skillKey + '" placeholder="Your answer"></div>' +
+        '<div class="hint-box" id="gapHint-' + skillKey + '"></div>' +
+        '<button class="q-submit-btn gap-practice-submit" data-skill="' + skillKey + '" style="margin-top:0.7rem;">Check</button>' +
+        '<div class="feedback-line" id="gapFeedback-' + skillKey + '"></div></div>' +
+        '<div class="gap-pointer">📘 ' + skill.deckPointer + '</div>';
+    } else {
+      card.className = 'gap-card solid';
+      card.innerHTML = '<div class="gap-skill">' + skill.label + '</div><span class="solid-chip">✅ Solid work — no gaps here!</span>';
+    }
+    container.appendChild(card);
+  });
+
+  container.querySelectorAll('.gap-practice-submit').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const skillKey = btn.dataset.skill;
+      const skill = SKILLS[skillKey];
+      const inp = container.querySelector('.gap-practice-input[data-skill="' + skillKey + '"]');
+      const fb = document.getElementById('gapFeedback-' + skillKey);
+      const hintBox = document.getElementById('gapHint-' + skillKey);
+      const practiceOk = skill.practice.numeric ? checkNumericAnswer(inp.value, skill.practice) : skill.practice.accept.includes(norm(inp.value));
+      if (practiceOk) {
+        fb.textContent = '✅ Correct — nice work!';
+        fb.className = 'feedback-line good show';
+        inp.disabled = true; btn.disabled = true;
+      } else if (!btn.dataset.tried) {
+        btn.dataset.tried = '1';
+        hintBox.innerHTML = '<strong>💡 Hint:</strong> ' + skill.practice.hint;
+        hintBox.classList.add('show');
+        fb.textContent = 'Not quite — check the hint and try once more.';
+        fb.className = 'feedback-line bad show';
+      } else {
+        fb.textContent = 'This is just for practice — no worries either way! Keep going.';
+        fb.className = 'feedback-line bad show';
+        inp.disabled = true; btn.disabled = true;
+      }
+    });
+  });
+}
+
+/* =========================================================
+   RESET
+   ========================================================= */
+function hardResetToQuestion1(){
+  Object.values(gridCellsByPos).forEach(c => { c.filled = false; c.el.className = 'cell empty'; c.el.innerHTML = ''; });
+  document.querySelectorAll('.flag, .flag-pole').forEach(el => el.remove());
+  document.getElementById('rankBanner').classList.remove('show');
+  state.qIndex = 0; state.have = { gold:0, stone:0, wood:0 }; state.placed = 0; state.glitchShown = false; state.tally = {}; state.finished = false;
+  saveState();
+  updateProgressUI();
+  renderQuestion();
+}
+document.getElementById('resetLink').addEventListener('click', () => showModal('resetOverlay'));
+document.getElementById('resetCancelBtn').addEventListener('click', () => hideModal('resetOverlay'));
+document.getElementById('resetConfirmBtn').addEventListener('click', () => { hideModal('resetOverlay'); hardResetToQuestion1(); });
+
+/* =========================================================
+   REPLAY SAVED PROGRESS (for resume)
+   ========================================================= */
+function replaySavedBlocks(saved){
+  const order = Object.keys(saved.tally).map(k => saved.tally[k]);
+  order.forEach(t => placeBlockSilently(t.tier));
+}
+
+/* =========================================================
+   START
+   ========================================================= */
+document.getElementById('startBtn').addEventListener('click', () => {
+  const name = document.getElementById('studentNameInput').value.trim();
+  const code = document.getElementById('sessionCodeInput').value.trim();
+  state.studentName = name || 'Student';
+  state.sessionCode = code;
+  saveState();
+  document.getElementById('screenIntro').classList.remove('active');
+  document.getElementById('screenGame').classList.add('active');
+  updateProgressUI();
+  renderQuestion();
+});
+
+document.getElementById('resumeContinueBtn').addEventListener('click', () => {
+  hideModal('resumeOverlay');
+  const saved = loadState();
+  state = saved;
+  replaySavedBlocks(saved);
+  updateProgressUI();
+  document.getElementById('screenIntro').classList.remove('active');
+  document.getElementById('screenGame').classList.add('active');
+  if (state.finished) { finishCastle(); }
+  else { renderQuestion(); }
+});
+document.getElementById('resumeRestartBtn').addEventListener('click', () => {
+  hideModal('resumeOverlay');
+  localStorage.removeItem(GAME_STORAGE_KEY);
+});
+
+(function init(){
+  const saved = loadState();
+  if (saved && Object.keys(saved.tally || {}).length > 0) {
+    document.getElementById('resumeBody').textContent = 'Looks like ' + (saved.studentName || 'you') + ' was partway through building — ' + saved.placed + ' of ' + TOTAL + ' blocks placed. Want to continue where you left off?';
+    showModal('resumeOverlay');
+  }
+})();
 </script>
 </body>
 </html>
